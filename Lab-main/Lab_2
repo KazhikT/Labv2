@@ -1,0 +1,183 @@
+#include <iostream>
+
+using namespace std;
+
+struct ListNode {
+	int val;
+	ListNode* next;
+	
+	// Эта запись конструктора идентична предыдущей
+	ListNode() {
+		val = 0;
+		next = nullptr;
+
+	}
+	// Конструктор с параметром данных
+	ListNode(int x) : val(x), next(nullptr) {}
+	// Конструктор с параметром данных и указателем на следующий элемент списка
+	ListNode(int x, ListNode* next) : val(x), next(next) {}
+};
+
+
+class MyLinkedList {
+public:
+    MyLinkedList() : head(nullptr), size(0) {} 
+	size_t get_size() { return size; }	// Получить размер списка
+	void addAtHead(int val);
+	void add_at_tail(int val);	// Добавить элемент в конец списка
+	void add_at_index(size_t index, int val); // Добавить элемент по индексу
+	void delete_at_index(size_t index);	// Удалить элемент по индексу
+	void print();
+	void reverse();
+	void insertNode(size_t index, int val);
+private:
+	ListNode* head;
+	size_t size;
+};
+
+void MyLinkedList::addAtHead(int val) {//1.1 
+	// Создать новый узел
+	ListNode* newNode = new ListNode(val);
+
+	// Установить новый узел как новую голову списка
+	newNode->next = head;
+	head = newNode;
+
+	// Увеличить размер списка
+	++size;
+}
+void MyLinkedList::add_at_tail(int val) {
+	// Создать новый экземляр ListNode или новый элемент списка
+	ListNode* newNode = new ListNode(val, nullptr);
+
+	if (head == nullptr) {
+		head = newNode;
+		return;
+	}
+	// Двигаем указатель it до достижения последнего элемента списка
+	ListNode* it = head;
+	while (it->next != nullptr)
+		it = it->next;
+	
+	// Присваиеваем указателю на следующий элемент (next) текущего последнего элемента
+	// адрес нового последнего элемента
+	it->next = newNode;
+
+	++size;
+}
+    
+void MyLinkedList::delete_at_index(size_t index) {
+	if (index >= size + 1) {
+		cout << "Index is larger than the size=" << size << "\n";
+		return;
+	}
+	
+	ListNode* prev = head;
+
+	if (index == 0) {
+		head = head->next;
+		delete prev;
+	}
+	
+	ListNode* curr = head->next;
+	size_t pos = 0;
+	
+	while (prev != nullptr && pos < index - 1) {
+		prev = prev->next;
+		curr = curr->next;
+		++pos;
+	}
+	prev->next = curr->next;
+	delete curr;
+
+	--size;
+}
+
+void MyLinkedList::add_at_index(size_t index, int val) {
+	ListNode* prev = head;
+	ListNode* curr = head->next;
+	size_t pos = 0;
+	
+	while (prev != nullptr && pos < index - 1) {
+		prev = prev->next;
+		curr = curr->next;
+		++pos;
+	}
+	ListNode* newNode = new ListNode(val, curr);
+	prev->next = newNode;
+
+	++size;
+}
+void MyLinkedList::print() {//1.2
+	ListNode* current = head;
+
+	while (current != nullptr) {
+		cout << current->val << " ";
+		current = current->next;
+	}
+
+	cout << endl;
+}
+void MyLinkedList::reverse() {//1.3
+	ListNode* prev = nullptr;
+	ListNode* current = head;
+	ListNode* next = nullptr;
+
+	while (current != nullptr) {
+		next = current->next;   // Сохраняем указатель на следующий элемент
+		current->next = prev;   // Изменяем указатель на следующий элемент на предыдущий
+		prev = current;         // Перемещаем prev на текущий элемент
+		current = next;         // Перемещаем current на следующий элемент
+	}
+
+	head = prev;  // Обновляем указатель на голову списка
+}
+void MyLinkedList::insertNode(size_t index, int val) {// 2
+	if (index > size) {
+		cout << "Index is larger than the size=" << size << "\n";
+		return;
+	}
+
+	ListNode* newNode = new ListNode(val);
+
+	if (index == 0) {
+		// Вставка элемента в начало списка
+		newNode->next = head;
+		head = newNode;
+	}
+	else {
+		ListNode* current = head;
+		size_t pos = 0;
+		while (pos < index - 1) {
+			current = current->next;
+			++pos;
+		}
+		newNode->next = current->next;
+		current->next = newNode;
+	}
+
+	++size;
+}
+
+int main() {
+	int arr[5] = {1, 2, 3, 4, 5};
+	MyLinkedList* obj = new MyLinkedList();
+	for (int val : arr) {
+		obj->add_at_tail(val);
+	}
+	// obj->print_list();
+	cout << "Deleting the last element...\n";
+	obj->delete_at_index(4);
+	// obj->print_list();
+
+	cout << "Add at index 3\n";
+	obj->add_at_index((size_t) 2, 10);
+	// obj->print_list();
+	obj->addAtHead(12);
+	cout << "List after deletion: ";
+	obj->print();
+	cout << "List after reverse: ";
+	obj->reverse();
+	obj->print();
+  	return 0;
+}
